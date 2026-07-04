@@ -6,8 +6,9 @@ import authRouter from "./routes/auth.routes.js";
 import messageRouter from "./routes/message.route.js"
 import cookieparser from 'cookie-parser'
 import cors from 'cors'
+import { app, server } from "./lib/socket.js";
 
-const app = express();
+
 
 const port = process.env.PORT
 
@@ -19,9 +20,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieparser())
 app.use(cors({ origin: "http://localhost:5173", credentials: true }))
 app.use("/api/auth", authRouter)
-app.use("/api/message", messageRouter)
+app.use("/api/messages", messageRouter)
 
-app.listen(port || 8000, () => {
+server.listen(port || 8000, () => {
     console.log(`server is running on port: ${port}`)
     connectDB();
 })
