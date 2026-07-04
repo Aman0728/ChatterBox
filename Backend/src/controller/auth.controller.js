@@ -5,7 +5,6 @@ import { ENV } from "../lib/env.js";
 import { generateToken } from "../lib/utils.js";
 
 export const signup = async (req, res) => {
-    console.log(req.body)
     const {fullName, email, password} = req.body
     try {
         if(!fullName || !email || !password) {
@@ -45,10 +44,11 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
     try {
         const {email, password} = req.body;
+        console.log(email, password)
         if(!email || !password) return res.status(400).json({message: "All fields are required"});
         const user = await User.findOne({email})
         if(!user) return res.status(400).json({message: "Invalid credentials"});
-        const passwordcheck = bcrypt.compare(password, user.password);
+        const passwordcheck = await bcrypt.compare(password, user.password);
         if(!passwordcheck) return res.status(400).json({message: "Invalid credentials"});
 
         generateToken(user._id, res)
@@ -67,4 +67,8 @@ export const login = async (req, res) => {
 export const logout = (req, res) => {
     res.cookie("jwt", "", {maxAge: 0})
     return res.status(200).json({message: "Logged out successfully"})
+}
+
+export const check = (req, res) => {
+    
 }
