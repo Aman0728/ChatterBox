@@ -4,6 +4,7 @@ import { connectDB } from "./lib/db.js";
 dotenv.config()
 import authRouter from "./routes/auth.routes.js";
 import messageRouter from "./routes/message.route.js"
+import groupRouter from "./routes/group.route.js"
 import cookieparser from 'cookie-parser'
 import cors from 'cors'
 import { app, server } from "./lib/socket.js";
@@ -21,6 +22,7 @@ app.use(cookieparser())
 app.use(cors({ origin: "http://localhost:5173", credentials: true }))
 app.use("/api/auth", authRouter)
 app.use("/api/messages", messageRouter)
+app.use("/api/group", groupRouter)
 
 server.listen(port || 8000, () => {
     console.log(`server is running on port: ${port}`)

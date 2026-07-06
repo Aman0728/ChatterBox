@@ -3,6 +3,7 @@ import useKeyboardSound from "../hooks/useKeyboardSound";
 import { useChatStore } from "../store/useChatStore";
 import toast from "react-hot-toast";
 import { ImageIcon, SendIcon, XIcon } from "lucide-react";
+import { useGroupStore } from "../store/useGroupStore";
 
 function MessageInput() {
   const { playRandomKeyStrokeSound } = useKeyboardSound();
@@ -11,17 +12,25 @@ function MessageInput() {
 
   const fileInputRef = useRef(null);
 
-  const { sendMessage, isSoundEnabled } = useChatStore();
+  const { sendMessage, isSoundEnabled, selectedUser } = useChatStore();
+  const {sendGroupMessage} = useGroupStore();
 
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!text.trim() && !imagePreview) return;
     if (isSoundEnabled) playRandomKeyStrokeSound();
-
-    sendMessage({
-      text: text.trim(),
-      image: imagePreview,
-    });
+    console.log(selectedUser)
+    if(selectedUser) {
+      sendMessage({
+        text: text.trim(),
+        image: imagePreview,
+      });
+    }else {
+      sendGroupMessage({
+        text: text.trim(),
+        image: imagePreview,
+      });
+    }
     setText("");
     setImagePreview("");
     if (fileInputRef.current) fileInputRef.current.value = "";

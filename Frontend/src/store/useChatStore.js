@@ -7,6 +7,8 @@ import { useAuthStore } from "./useAuthStore";
 export const useChatStore = create((set, get) => ({
     activeTab: "chats",
     selectedUser: null,
+    isSelectedUserBlocked: false,
+    isUserBlockedBySelectedUser: false,
     isUsersLoading: false,
     isMessagesLoading: false,
     isSoundEnabled: JSON.parse(localStorage.getItem("isSoundEnabled")) === true,
@@ -21,6 +23,16 @@ export const useChatStore = create((set, get) => ({
 
     setActiveTab: (tab) => set({activeTab: tab}),
     setSelectedUser: (user) => set({selectedUser: user}),
+    checkBlocked: async (userId) => {
+        try {
+            const res = await axiosInstance.get(`/auth/block/${userId}`)
+            console.log(res.data)
+            set({isUserBlockedBySelectedUser: res.data.isBlocked})
+            set({isSelectedUserBlocked: res.data.blocked})
+        } catch (error) {
+            console.log("Unable to checkBlocked")
+        }
+    },
 
     getAllContacts: async() => {
         set({isUsersLoading: true})
@@ -58,6 +70,19 @@ export const useChatStore = create((set, get) => ({
         }
     },
 
+    clearChat: async (userId) => {
+        set({ isMessagesLoading: true });
+        try {
+            const res = await axiosInstance.delete(`/messages/clear/${userId}`)
+            set({messages: []})
+            toast.success("Message deleted successfully")
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Something went wrong");
+        } finally {
+            set({ isMessagesLoading: false });
+        }
+    },
+
     sendMessage: async (messageData) => {
         const { selectedUser, messages } = get();
         const { authUser } = useAuthStore.getState();
@@ -81,6 +106,7 @@ export const useChatStore = create((set, get) => ({
             set({ messages: messages.concat(res.data) });
         } catch (error) {
             set({ messages: messages });
+            console.log(error)
             toast.error(error.response?.data?.message || "Something went wrong");
         }
     },

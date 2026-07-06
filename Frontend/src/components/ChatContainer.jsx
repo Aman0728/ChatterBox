@@ -14,16 +14,28 @@ function ChatContainer() {
     isMessagesLoading,
     subscribeToMessages,
     unsubscribeFromMessages,
+    checkBlocked,
+    isUserBlockedBySelectedUser,
+    isSelectedUserBlocked,
   } = useChatStore();
   const { authUser } = useAuthStore();
   const messageEndRef = useRef(null);
 
   useEffect(() => {
+    if (!selectedUser) return;
+
     getMessagesByUserId(selectedUser._id);
+    checkBlocked(selectedUser._id);
     subscribeToMessages();
 
     return () => unsubscribeFromMessages();
-  }, [selectedUser, getMessagesByUserId, subscribeToMessages, unsubscribeFromMessages]);
+  }, [
+    selectedUser,
+    getMessagesByUserId,
+    checkBlocked,
+    subscribeToMessages,
+    unsubscribeFromMessages,
+  ]);
 
   useEffect(() => {
     if (messageEndRef.current) {
@@ -50,7 +62,11 @@ function ChatContainer() {
                   }`}
                 >
                   {msg.image && (
-                    <img src={msg.image} alt="Shared" className="rounded-lg h-48 object-cover" />
+                    <img
+                      src={msg.image}
+                      alt="Shared"
+                      className="rounded-lg h-48 object-cover"
+                    />
                   )}
                   {msg.text && <p className="mt-2">{msg.text}</p>}
                   <p className="text-xs mt-1 opacity-75 flex items-center gap-1">
@@ -72,7 +88,27 @@ function ChatContainer() {
         )}
       </div>
 
-      <MessageInput />
+      {isUserBlockedBySelectedUser ? (
+        <div className="border-t border-slate-700 bg-slate-900 px-6 py-5 text-center">
+          <p className="text-red-400 font-semibold">
+            You are blocked by {selectedUser.fullName}
+          </p>
+          <p className="text-sm text-slate-400 mt-1">
+            You can't send messages to this user.
+          </p>
+        </div>
+      ) : isSelectedUserBlocked ? (
+        <div className="border-t border-slate-700 bg-slate-900 px-6 py-5 text-center">
+          <p className="text-yellow-400 font-semibold">
+            You have blocked {selectedUser.fullName}
+          </p>
+          <p className="text-sm text-slate-400 mt-1">
+            Unblock them to continue chatting.
+          </p>
+        </div>
+      ) : (
+        <MessageInput />
+      )}
     </>
   );
 }

@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import { sendWelcomeEmail } from "../emails/emailHandler.js";
 import { ENV } from "../lib/env.js";
 import { generateToken } from "../lib/utils.js";
+import { Block } from "../model/Block.model.js";
 
 export const signup = async (req, res) => {
     const {fullName, email, password} = req.body
@@ -71,4 +72,51 @@ export const logout = (req, res) => {
 
 export const check = (req, res) => {
     
+}
+
+export const block = async(req, res) => {
+    try {
+        const block = await Block.create({
+            blocker: req.user._id,
+            blocked: req.params.id
+        })
+        return res.status(200).json(block)
+    } catch (error) {
+        console.log("Error in block controller", block)
+        return res.status(400).json({message: "Internal server error"})
+    }
+}
+
+export const unblock = async(req, res) => {
+    try {
+        const exists = await Block.findOneAndDelete({
+            blocker: req.user._id,
+            blocked: req.params.id
+        })
+        return res.status(200).json(exists)
+    } catch (error) {
+        console.log("Error in Unblock", error)
+        return res.status(400).json({message: "Internal server error"})
+    }
+}
+
+export const checkBlock = async(req, res) => {
+    console.log("1 checkBlock called")
+    try {
+        console.log("2 Inside try block")
+        const blockedBySelectedUser = await Block.findOne({
+            blocker: req.params.id,
+            blocked: req.user._id
+        })
+        const blockedByUser = await Block.findOne({
+            blocked: req.params.id,
+            blocker: req.user._id
+        })
+        console.log("3 After res")
+        return res.status(200).json({isBlocked: blockedBySelectedUser ? true : false, 
+            blocked: blockedByUser ? true : false})
+    } catch (error) {
+        console.log("Error in checkBlock", error)
+        return res.status(400).json({message: "Internal server error"});
+    }
 }

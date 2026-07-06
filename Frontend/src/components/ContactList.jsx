@@ -2,10 +2,12 @@ import { useEffect } from "react";
 import { useChatStore } from "../store/useChatStore";
 import UsersLoadingSkeleton from "./UsersLoadingSkeleton";
 import { useAuthStore } from "../store/useAuthStore";
+import { useGroupStore } from "../store/useGroupStore";
 
 function ContactList() {
   const { getAllContacts, allContacts, setSelectedUser, isUsersLoading } = useChatStore();
   const { onlineUsers } = useAuthStore();
+  const {setSelectedGroup} = useGroupStore()
 
   useEffect(() => {
     getAllContacts();
@@ -19,7 +21,10 @@ function ContactList() {
         <div
           key={contact._id}
           className="bg-cyan-500/10 p-4 rounded-lg cursor-pointer hover:bg-cyan-500/20 transition-colors"
-          onClick={() => setSelectedUser(contact)}
+          onClick={() => {
+            setSelectedUser(contact)
+            setSelectedGroup(null)
+          }}
         >
           <div className="flex items-center gap-3">
             <div className={`avatar ${onlineUsers.includes(contact._id) ? "avatar-online" : "avatar-offline"}`}>

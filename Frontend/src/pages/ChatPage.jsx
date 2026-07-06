@@ -1,4 +1,5 @@
 import { useChatStore } from "../store/useChatStore";
+import { useGroupStore } from "../store/useGroupStore";
 
 import BorderAnimatedContainer from "../components/BorderAnimatedContainer";
 import ProfileHeader from "../components/ProfileHeader";
@@ -7,9 +8,13 @@ import ChatsList from "../components/ChatsList";
 import ContactList from "../components/ContactList";
 import ChatContainer from "../components/ChatContainer";
 import NoConversationPlaceholder from "../components/NoConversationPlaceholder";
+import GroupList from "../components/GroupList";
+import GroupChatContainer from "../components/GroupChatContainer";
+import ContainerUltimate from "../components/ContainerUltimate";
 
 function ChatPage() {
   const { activeTab, selectedUser } = useChatStore();
+  const { selectedGroup } = useGroupStore()
 
   return (
     <div className="relative w-full max-w-6xl h-[800px]">
@@ -20,13 +25,13 @@ function ChatPage() {
           <ActiveTabSwitch />
 
           <div className="flex-1 overflow-y-auto p-4 space-y-2">
-            {activeTab === "chats" ? <ChatsList /> : <ContactList />}
+            {activeTab === "chats" ? <ChatsList /> : activeTab === "contacts" ? <ContactList /> : <GroupList />}
           </div>
         </div>
 
         {/* RIGHT SIDE */}
         <div className="flex-1 flex flex-col bg-slate-900/50 backdrop-blur-sm">
-          {selectedUser ? <ChatContainer /> : <NoConversationPlaceholder />}
+          <ContainerUltimate />
         </div>
       </BorderAnimatedContainer>
     </div>
